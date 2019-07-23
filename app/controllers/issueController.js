@@ -342,13 +342,10 @@ let getAllIssueOnSystem = (req, res) => {
 
 
 let searchIssue = (req,res) =>{
-    if (check.isEmpty(req.params.text)){
-        logger.error(true, "issueController:searchIssue", 10);
-        let apiResponse = response.generate(true, "No text entered for search", 500, null);
-        res.send(apiResponse);
-    } else {
+    console.log("in text searck",req.params.text)
+    
         
-            IssueModel.find({ $text: { $search: req.params.text } })
+            IssueModel.find({ $text:{ $search: req.params.text } })
                 
                 .exec((err, result) =>{
                     if (err){
@@ -367,8 +364,8 @@ let searchIssue = (req,res) =>{
                     }
                 })
 
-        //}
-    }
+        
+    
 }
 
 //commment 

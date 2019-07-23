@@ -20,57 +20,6 @@ const WatcherModel = mongoose.model('Watcher');
 const NotificationModel = mongoose.model('Notification')
 
 
-//for issue create
-
-let createANewNotificationObj = (issueDetails) => {
-
-    NotificationModel.findOne({ notificationIssueId: issueDetails.issueId, notificationPurpose: "create" }, (err, result) => {
-
-        if (err) {
-            console.log(err);
-            logger.error(err.message, 'notificationController: createANewnotificationObj', 10)
-
-        } else if (check.isEmpty(result)) {
-
-            let peopleToSendNotification = [issueDetails.reporterEmail, issueDetails.assigneeEmail]
-
-    
-            
-
-            for (let x of peopleToSendNotification)
-            {
-                let newnotificationObj = new NotificationModel({
-                    notificationId: shortid.generate(),
-                    notificationIssueId: issueDetails.issueId,
-                    notificationStatus: "un-seen",
-                    notificationMessage: `hey a new issue is created with Details ${issueDetails}`,
-                    notificationPurpose: 'create',
-                    userEmailToSendNotification:x
-    
-                })
-    
-                newnotificationObj.save((err, result) => {
-                    if (err) {
-                        console.log("error while saving notifiction: ", err)
-                        logger.error(err.message, 'notificationController: createNewNotification', 10)
-    
-                    } else {
-                        console.log("notificationObj Created & saved successfully", result)
-                        logger.info("notificationObj Created successfully", 'notificationController: createNewNotification', 1)
-                    }
-                })
-            }
-            }
-           
-        else {
-            console.log("notification obj allready exists for the purpose ", err)
-            logger.error('notification obj allready exists for the purpose', 'notificationController: createNewNotification', 10)
-
-        }
-
-    })
-
-}
 
 function getUnique(array){
     var uniqueArray = [];
@@ -83,6 +32,73 @@ function getUnique(array){
     }
     return uniqueArray;
 }
+
+//for issue create
+
+let createANewNotificationObj = (issueDetails) => {
+
+    NotificationModel.findOne({ 'notificationIssueData.issueId' : issueDetails.issueId, notificationPurpose: "create" }, (err, result) => {
+
+        if (err) {
+            console.log(err);
+            logger.error(err.message, 'notificationController: createANewnotificationObj', 10)
+
+        } else if (check.isEmpty(result)) {
+
+            let peopleToSendNotification = [issueDetails.reporterEmail, issueDetails.assigneeEmail]
+            peopleToSendNotification = getUnique(peopleToSendNotification)
+
+    
+            let flag =0
+            let len =peopleToSendNotification.length
+
+            for (let x of peopleToSendNotification)
+            {
+                let newnotificationObj = new NotificationModel({
+                    notificationId: shortid.generate(),
+                    notificationIssueData: issueDetails,
+                    notificationStatus: "un-seen",
+                    notificationMessage: `hey a new issue is created with IssueId${issueDetails.issueId} by ${issueDetails.reporterName}`,
+                    notificationPurpose: 'create',
+                    userEmailToSendNotification:x
+    
+                })
+    
+                newnotificationObj.save((err, result) => {
+                    if (err) {
+                        console.log("error while saving notifiction: ", err)
+                        logger.error(err.message, 'notificationController: createNewNotification', 10)
+    
+                    } else {
+                        flag++;
+                        console.log("notificationObj Created & saved successfully", result)
+                        logger.info("notificationObj Created successfully", 'notificationController: createNewNotification', 1)
+                    }
+                })
+            }
+
+
+            if (flag != len)
+        {
+           
+            console.log ("not !all notifications created successfully for create event of the issues")
+        }
+        else
+        {
+            console.log("all notifications created successfully for create event of the issues")
+        }
+            }
+           
+        else {
+            console.log("notification obj allready exists for the purpose ", err)
+            logger.error('notification obj allready exists for the purpose', 'notificationController: createNewNotification', 10)
+
+        }
+
+    })
+
+}
+
 
 let createANewNotificationObjOnEdit = (issueDetails) => {
 
@@ -152,7 +168,7 @@ let createANewNotificationObjOnEdit = (issueDetails) => {
                 notificationId: shortid.generate(),
                 notificationIssueData: finalIssueObj,
                 notificationStatus: "un-seen",
-                notificationMessage: `hey a new issue is something Updated in Issue Details Details ${finalIssueObj}`,
+                notificationMessage: `hey  something Updated in Issue with issueId: ${finalIssueObj.issueId}`,
                 notificationPurpose: 'edit',
                 userEmailToSendNotification: x
 
@@ -225,7 +241,7 @@ let createNotificationObjOnComment = (commentData) => {
 
         return new Promise((resolve, reject) => {
 
-            WatcherModel.find({ issueId:commentData.issueId }, (err, result) => {
+            WatcherModel.find({ issueId:commentData.relatedIssuesId }, (err, result) => {
 
 
                 if (err) {
@@ -235,7 +251,7 @@ let createNotificationObjOnComment = (commentData) => {
                     reject(apiResponse)
                 }
                 else {
-                     console.log("notificationObj Created successfully On comment", result)
+                     console.log("notificationObj Created whatcher search On comment", result)
                     // logger.info("notificationObj Created successfully", 'notificationController: createNewNotification', 1)
                     for (let x in result) {
                          peopleToSendNotification.push(result[x].watcherEmail)
@@ -264,7 +280,7 @@ let createNotificationObjOnComment = (commentData) => {
         console.log("commentData in createNotification -> add AssigneeAndReporter",commentData)
         return new Promise((resolve, reject) => {
 
-            IssueModel.findOne({ issueId:commentData.issueId }, (err, result) => {
+            IssueModel.findOne({ issueId:commentData.relatedIssuesId }, (err, result) => {
                 if (err) {
                     console.log(err);
                     logger.error(err.message, 'notificationController: createANewNotificationObjOnCommentCreate', 10)
@@ -272,8 +288,9 @@ let createNotificationObjOnComment = (commentData) => {
                     reject(apiResponse)
                 }
                 else {
-                    commentData.peopleToSendList.push(result.issueReporterEmail, result.issueAssigneeEmail)
-                    commentData.peopleToSendList=uniqueArray( commentData.peopleToSendList)
+                    commentData.issueData = result
+                    commentData.peopleToSendList.push(result.reporterEmail, result.assigneeEmail)
+                    commentData.peopleToSendList= getUnique(commentData.peopleToSendList)
                     resolve(commentData)
                 }
 
@@ -292,9 +309,9 @@ let createNotificationObjOnComment = (commentData) => {
                 let newNotificationObj = new NotificationModel({
     
                     notificationId: shortid.generate(),
-                    notificationIssueId: commentData.issueId,
+                    notificationIssueData: commentData.issueData,
                     notificationStatus: "un-seen",
-                    notificationMessage:commentData,
+                    notificationMessage:`hey ${commentData.commenter} commented on the issue with id ${commentData.relatedIssuesId} on ${commentData.createdOn}`,
                     notificationPurpose: 'comment-create',
                     userEmailToSendNotification: x
         

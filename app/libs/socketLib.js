@@ -20,7 +20,7 @@ const timeZone = 'Asia/Calcutta'
 
 const time = require('./timeLib');
 //const checkEvent = require('./checkEventLib')
-const cron = require("node-cron");
+//const cron = require("node-cron");
 
 
 
@@ -39,6 +39,10 @@ let setServer = (server) => {
 
       // socket.emit("verifyUser", "");
   socket.on("sendMyNotification",(userEmail)=>{
+
+
+    console.log("in on fun")
+
 
     NotificationModel.find({userEmailToSendNotification:userEmail,notificationStatus:"un-seen"},(err,result)=>{
       if (err) {

@@ -15,8 +15,11 @@ const IssueModel = mongoose.model('Issues')
 const CommentModel = mongoose.model('Comment');
 const WatcherModel = mongoose.model('Watcher');
 
+const events = require('events');
+const eventEmitter = new events.EventEmitter();
 
 
+const notificationController = require ('./notificationController')
 
 let createNewComment = (req, res) => {
 
@@ -94,7 +97,7 @@ let createNewComment = (req, res) => {
                     console.log("comment created");
                     logger.info("comment created", "issueController: writeComment");
                     let apiResponse = response.generate(false, 'Commented successfully', 200, newComment);
-                    // eventEmitter.emit("comment-write", newComment);
+                     eventEmitter.emit("comment-write", newComment);
                     resolve(newComment);
                 }
             })
@@ -113,6 +116,40 @@ let createNewComment = (req, res) => {
 
 
 }
+
+
+eventEmitter.on("comment-write", (commentData) => {
+      console.log("data in comment event on ",commentData)
+    IssueModel.findOne({ 'issueId': commentData.relatedIssuesId })
+    .select('-__v -_id')
+
+    .exec((err, result) => {
+        if (err) {
+            console.log(err);
+            logger.error(err.message, 'commentController: eventEmitter.on-> new comment created', 10)
+            // let apiResponse = response.generate(true, 'Failed To Find Issue Details', 500, null)
+            // res.send(apiResponse)
+        } else if (check.isEmpty(result)) {
+            logger.info('No Issue found', 'commentController: eventEmitter.on-> new comment created')
+            // let apiResponse = response.generate(true, 'No issue found', 404, null)
+            // res.send(apiResponse)
+        } else {
+            logger.info('Issue found', 'commentController: eventEmitter.on-> new comment created');
+
+            // console.log("resul t in event emmiter",result)
+            notificationController.createNotificationObjOnComment(commentData)
+            // let apiResponse = response.generate(false, 'Issue details found', 200, result)
+            // res.send(apiResponse)
+        }
+    })
+
+// notificationController.createANewNotificationObjOnEdit(issueData)
+
+
+
+
+})
+
 
 let readComment = (req, res) => {
 
