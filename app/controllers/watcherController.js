@@ -19,7 +19,7 @@ const WatcherModel = mongoose.model('Watcher');
 
 
 let addWatcherToAnIssue = (req, res) => {
-    // WatcherModel.findOne({'issueId': req.body.issueId,'watcherEmail': req.body.watcherEmail })
+
     WatcherModel.findOne({ $and: [{ 'issueId': req.body.issueId }, { 'watcherEmail': req.body.watcherEmail }] })
         .select('-__v -_id')
         // .lean()
@@ -84,7 +84,7 @@ let getAllWatchersOfAnIssue = (req, res) => {
 } // end of getWatcher of An Idssue function.
 
 
-module.exports={
-    addWatcherToAnIssue:addWatcherToAnIssue,
-    getAllWatchersOfAnIssue:getAllWatchersOfAnIssue
+module.exports = {
+    addWatcherToAnIssue: addWatcherToAnIssue,
+    getAllWatchersOfAnIssue: getAllWatchersOfAnIssue
 }

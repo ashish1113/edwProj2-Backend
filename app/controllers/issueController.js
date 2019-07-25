@@ -16,7 +16,7 @@ const IssueModel = mongoose.model('Issues')
 const CommentModel = mongoose.model('Comment');
 const WatcherModel = mongoose.model('Watcher');
 
-const notificationController = require ('./notificationController')
+const notificationController = require('./notificationController')
 
 
 let createNewIssue = (req, res) => {
@@ -43,25 +43,25 @@ let createNewIssue = (req, res) => {
 
     let createIssue = () => {
         return new Promise((resolve, reject) => {
-        console.log("in createIssue-----------------++++++++++++++")
+            console.log("in createIssue-----------------++++++++++++++")
             let fileName = req.file.path.split('\\')[0]
 
-            console.log('filepath',fileName)
+            console.log('filepath', fileName)
 
-            console.log("filein req",req.file)
+            console.log("filein req", req.file)
             let newIssue = new IssueModel({
                 issueId: shortid.generate(),
                 title: req.body.title,
                 reporterEmail: req.body.reporterEmail,
                 assigneeEmail: req.body.assigneeEmail,
-                reporterName:req.body.reporterName,
+                reporterName: req.body.reporterName,
                 assigneeName: req.body.assigneeName,
                 status: req.body.status,
                 creationDate: time.now(),
                 lastestModificationDate: time.now(),
                 description: req.body.description,
-                screenshotName:req.file.filename,
-                screenshotPath:fileName
+                screenshotName: req.file.filename,
+                screenshotPath: fileName
             })
 
             newIssue.save((err, newIssue) => {
@@ -75,11 +75,11 @@ let createNewIssue = (req, res) => {
                 }
                 else {
                     let newIssueObj = newIssue.toObject();
-                     console.log("new issue created ",newIssueObj)
-                      eventEmitter.emit("new-issue-created & saved", newIssueObj);
-                     resolve(newIssueObj)
-                   
-                    
+                    console.log("new issue created ", newIssueObj)
+                    eventEmitter.emit("new-issue-created & saved", newIssueObj);
+                    resolve(newIssueObj)
+
+
 
                 }
             })
@@ -91,8 +91,8 @@ let createNewIssue = (req, res) => {
         .then(createIssue)
         .then((resolve) => {
             console.log("in resolve----------------")
-            let apiResponse = response.generate(false,'new issue created successfully', 200, resolve)
-            console.log("apiRespose on create ",apiResponse)
+            let apiResponse = response.generate(false, 'new issue created successfully', 200, resolve)
+            console.log("apiRespose on create ", apiResponse)
             res.send(apiResponse)
         })
         .catch((err) => {
@@ -104,8 +104,8 @@ let createNewIssue = (req, res) => {
 
 
 eventEmitter.on("new-issue-created & saved", (issueData) => {
-      
-   
+
+
     notificationController.createANewNotificationObj(issueData)
 
 
@@ -116,21 +116,12 @@ eventEmitter.on("new-issue-created & saved", (issueData) => {
 
 
 let editAnExistingIssue = (req, res) => {
-    // fs.unlinkSync('./uploads/' +  req.body.previous);
-    // let options = req.body;
+
     if (req.file) {
 
         console.log("in if in edit function", req.file)
         let fileName = req.file.path.split('\\')[0]
-        // let finalPath
 
-
-
-        // findScreenShotPathOfAIssue(req.params.issueId);
-        //  console.log(check.findScreenShotPathOfAIssue(req.params.issueId))
-
-        // console.log('pa',finalPath)
-        // fs.unlinkSync('uploads' +req.body.previous);
         let options = req.body;
         options.screenshotName = req.file.filename;
         options.screenshotPath = fileName
@@ -173,7 +164,7 @@ let editAnExistingIssue = (req, res) => {
             } else {
                 console.log("issue details edited");
                 let apiResponse = response.generate(false, 'Issue details edited', 200, result)
-                 eventEmitter.emit("issue-edited", req.params.issueId);
+                eventEmitter.emit("issue-edited", req.params.issueId);
 
                 res.send(apiResponse)
                 console.log(result);
@@ -187,39 +178,30 @@ let editAnExistingIssue = (req, res) => {
 eventEmitter.on("issue-edited", (issueData) => {
 
     IssueModel.findOne({ 'issueId': issueData })
-    .select('-__v -_id')
+        .select('-__v -_id')
 
-    .exec((err, result) => {
-        if (err) {
-            console.log(err);
-            logger.error(err.message, 'issueController: eventEmitter.on-> new issue created', 10)
-            // let apiResponse = response.generate(true, 'Failed To Find Issue Details', 500, null)
-            // res.send(apiResponse)
-        } else if (check.isEmpty(result)) {
-            logger.info('No Issue found', 'issueController: eventEmitter.on-> new issue created')
-            // let apiResponse = response.generate(true, 'No issue found', 404, null)
-            // res.send(apiResponse)
-        } else {
-            logger.info('Issue found', 'issueController: eventEmitter.on-> new issue created');
+        .exec((err, result) => {
+            if (err) {
+                console.log(err);
+                logger.error(err.message, 'issueController: eventEmitter.on-> new issue created', 10)
 
-            // console.log("resul t in event emmiter",result)
-            notificationController.createANewNotificationObjOnEdit(result)
-            // let apiResponse = response.generate(false, 'Issue details found', 200, result)
-            // res.send(apiResponse)
-        }
-    })
+            } else if (check.isEmpty(result)) {
+                logger.info('No Issue found', 'issueController: eventEmitter.on-> new issue created')
 
-// notificationController.createANewNotificationObjOnEdit(issueData)
+            } else {
+                logger.info('Issue found', 'issueController: eventEmitter.on-> new issue created');
 
-
+                notificationController.createANewNotificationObjOnEdit(result);
+            }
+        })
 
 
 })
 
-let deleteAnIssue = (req,res) =>{
-    // findScreenShotPathOfAIssue(req.params.issueId);
-    IssueModel.findOneAndDelete({'issueId': req.params.issueId }).exec((err,result) =>{
-        if(err){
+let deleteAnIssue = (req, res) => {
+
+    IssueModel.findOneAndDelete({ 'issueId': req.params.issueId }).exec((err, result) => {
+        if (err) {
             console.log(err)
             logger.error(err.message, 'issueController: deleteIssue', 10)
             let apiResponse = response.generate(true, 'Failed To delete issue', 500, null)
@@ -229,38 +211,15 @@ let deleteAnIssue = (req,res) =>{
             let apiResponse = response.generate(true, 'No Issue Found', 404, null)
             res.send(apiResponse)
         } else {
-        console.log("result to test in delete",result)  
-        console.log("result screenshot to test in delete",result.screenshotPath)             
-        // findScreenShotPathOfAIssue(req.params.issueId);
+            console.log("result to test in delete", result)
+            console.log("result screenshot to test in delete", result.screenshotPath)
 
-        // if (result.screenshotPath != undefined || result.screenshotPath != null||result.screenshotPath != '')
-        // {
-        //     let pathData = result.screenshotPath
-
-        // console.log('path data to  be passed',pathData)
-        // // fs.unlinkSync(pathData);
-        //     eventEmitter.emit("delete ScreenShot On Delete",pathData)
-        // }
-        
             console.log("issue deleted successfully");
             let apiResponse = response.generate(false, 'Issue is deleted  successfully', 200, result)
             res.send(apiResponse)
         }
     })
-} // end of deleteIssue function.
-
-// eventEmitter.on("delete ScreenShot On Delete",(pathData)=>{
-//     console.log('path in delelete event on',pathData)
-//     fs.unlinkSync(pathData);
-
-//     // if (pathData != null ||pathData != undefined||pathData != '')
-//     // {  fs.unlinkSync(pathData);
-//     // }
-  
-// })
-
-
-
+}
 
 
 let getAllAssingedIssueOfAUser = (req, res) => {
@@ -315,9 +274,7 @@ let getAllIssueOnSystem = (req, res) => {
     IssueModel.find()
         .select('-__v -_id')
         .sort('-lastestModificationDate')
-        // .skip(parseInt(req.query.skip) || 0)
         .lean()
-        // .limit(10)
         .exec((err, result) => {
             if (err) {
                 console.log(err);
@@ -341,44 +298,41 @@ let getAllIssueOnSystem = (req, res) => {
 
 
 
-let searchIssue = (req,res) =>{
-    console.log("in text searck",req.params.text)
-    
-        
-            IssueModel.find({ $text:{ $search: req.params.text } })
-                
-                .exec((err, result) =>{
-                    if (err){
-                        console.log(err)
-                        logger.error(err.message, 'issueController: searchIssue', 10)
-                        let apiResponse = response.generate(true, 'Failed To find text', 500, null)
-                        res.send(apiResponse)
-                    } else if (check.isEmpty(result)) {
-                        logger.info('No Issue Found', 'issueController: searchIssue')
-                        let apiResponse = response.generate(true, 'No issue present with this search text', 404, null)
-                        res.send(apiResponse)
-                    } else {
-                        logger.info('Issues found', "issueController:searchIssue");
-                        let apiResponse = response.generate(false, "issues present by this search text", 200, result);
-                        res.send(apiResponse);
-                    }
-                })
+let searchIssue = (req, res) => {
+    console.log("in text searck", req.params.text)
 
-        
-    
+
+    IssueModel.find({ $text: { $search: req.params.text } })
+
+        .exec((err, result) => {
+            if (err) {
+                console.log(err)
+                logger.error(err.message, 'issueController: searchIssue', 10)
+                let apiResponse = response.generate(true, 'Failed To find text', 500, null)
+                res.send(apiResponse)
+            } else if (check.isEmpty(result)) {
+                logger.info('No Issue Found', 'issueController: searchIssue')
+                let apiResponse = response.generate(true, 'No issue present with this search text', 404, null)
+                res.send(apiResponse)
+            } else {
+                logger.info('Issues found', "issueController:searchIssue");
+                let apiResponse = response.generate(false, "issues present by this search text", 200, result);
+                res.send(apiResponse);
+            }
+        })
+
+
+
 }
 
-//commment 
-//watcher
-
 module.exports = {
-    createNewIssue:createNewIssue,
-    editAnExistingIssue:editAnExistingIssue,
+    createNewIssue: createNewIssue,
+    editAnExistingIssue: editAnExistingIssue,
     getAllIssueOnSystem: getAllIssueOnSystem,
     getAllAssingedIssueOfAUser: getAllAssingedIssueOfAUser,
     getSingleIssueDetails: getSingleIssueDetails,
-    searchIssue:searchIssue,
-    deleteAnIssue:deleteAnIssue
+    searchIssue: searchIssue,
+    deleteAnIssue: deleteAnIssue
 }
 
 

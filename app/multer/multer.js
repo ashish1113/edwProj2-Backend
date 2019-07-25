@@ -26,7 +26,7 @@ const storage = multer.diskStorage({
 
   
   const fileFilter = (req, file, cb) => {
-  //  console.log('\x1b[36m', err, '\x1b[0m');
+  
     checkFileType(file, cb);
   };
 
@@ -50,10 +50,6 @@ function checkFileType(file, cb){
   
   const upload = multer({
     storage: storage,
-    // limits: {
-    //   fileSize: 1024 * 1024 * 1
-    // },
-    // fileFilter: fileFilter
   });
 
   module.exports={
