@@ -352,8 +352,8 @@ let getAllUserOnSystem = (req,res) =>{
 
 
     let socialLogin =(req,res) =>{
-
-        let getUserDetails =()=>{
+       console.log("social login fun called")
+        let filterUserDetails =()=>{
             return new Promise ((resolve,reject)=>{
     
     
@@ -464,9 +464,9 @@ let getAllUserOnSystem = (req,res) =>{
             .then((resolve) => {
                 let apiResponse = response.generate(false, ' Social Login Successful', 200, resolve)
                 res.status(200)
-                // res.send(apiResponse)
+                 res.send(apiResponse)
     
-                res.redirect(`http://www.bhaiyaji.club:4200/loggedin/${apiResponse.data.authToken}`)
+                //res.redirect(`http://www.bhaiyaji.club:4200/loggedin/${apiResponse.data.authToken}`)
                 // console.log("response send on successful social login",res)
             })
             .catch((err) => {

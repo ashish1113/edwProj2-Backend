@@ -267,7 +267,7 @@ let getAllAssingedIssueOfAUser = (req, res) => {
 
     IssueModel.find({ 'assigneeEmail': req.params.email })
         .select('-__v -_id')
-
+        .sort('-lastestModificationDate')
         .exec((err, result) => {
             if (err) {
                 console.log(err)
