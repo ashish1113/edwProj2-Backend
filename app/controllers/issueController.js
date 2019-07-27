@@ -43,7 +43,6 @@ let createNewIssue = (req, res) => {
 
     let createIssue = () => {
         return new Promise((resolve, reject) => {
-            console.log("in createIssue-----------------++++++++++++++")
             let fileName = req.file.path.split('\\')[0]
 
             console.log('filepath', fileName)
@@ -69,8 +68,6 @@ let createNewIssue = (req, res) => {
                     console.log("error while saving new issue: ", err)
                     logger.error(err.message, 'IssueController: createIssue', 10)
                     let apiResponse = response.generate(true, 'Failed to create&save new Issue', 500, null)
-
-                    // console.log("apiRespose on create ",apiResponse)
                     reject(apiResponse)
                 }
                 else {
@@ -90,7 +87,6 @@ let createNewIssue = (req, res) => {
     validateIssueInput(req, res)
         .then(createIssue)
         .then((resolve) => {
-            console.log("in resolve----------------")
             let apiResponse = response.generate(false, 'new issue created successfully', 200, resolve)
             console.log("apiRespose on create ", apiResponse)
             res.send(apiResponse)
@@ -148,7 +144,6 @@ let editAnExistingIssue = (req, res) => {
 
     else {
 
-        console.log('inside else-------------------------------')
         let options = req.body;
         options.screenshot = `${req.body.previous}`;
         IssueModel.updateOne({ 'issueId': req.params.issueId }, options).exec((err, result) => {
