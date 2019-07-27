@@ -208,8 +208,6 @@ let createANewNotificationObjOnEdit = (issueDetails) => {
         .catch((err) => {
 
             console.log(err);
-
-            //logger ka dekhna hai
             logger.error(err.message, 'notificationController: createNewNotificationObjFor-IssueEdit', 10)
         })
 
@@ -223,7 +221,6 @@ let createNotificationObjOnComment = (commentData) => {
 
     let toSetUserEmailTOSendNotification = (commentData) => {
 
-        console.log("commentData in createNotification->78---------------------------------", commentData)
 
         return new Promise((resolve, reject) => {
 
@@ -339,8 +336,6 @@ let createNotificationObjOnComment = (commentData) => {
 
         .catch((err) => {
             console.log(err);
-
-            //logger ka dekhna hai
             logger.error(err.message, 'notificationController: createNewNotificationObjFor-IssueEdit', 10)
         })
 
