@@ -3,77 +3,69 @@ const mongoose = require('mongoose'),
 
 let issueSchema = new Schema({
 
-    issueId: {
-        type: String,
-        default: '',
-        index: true,
-        unique: true
-      },
+  issueId: {
+    type: String,
+    default: '',
+    index: true,
+    unique: true
+  },
 
-      title: {
-          type:String,
-          default:''
+  title: {
+    type: String,
+    default: ''
 
-      },
-      reporterEmail: {
-          type:String,
-          required:true
-      },
+  },
+  reporterEmail: {
+    type: String,
+    required: true
+  },
 
-      assigneeEmail:{
-        type:String,
-        required:true
-      },
-      reporterName: {
-        type:String,
-        required:true
-    },
+  assigneeEmail: {
+    type: String,
+    required: true
+  },
+  reporterName: {
+    type: String,
+    required: true
+  },
 
-    assigneeName:{
-      type:String,
-      required:true
-    },
-      status:{
-          type:String,
+  assigneeName: {
+    type: String,
+    required: true
+  },
+  status: {
+    type: String,
 
-      },
-      creationDate:{
-          type:Date,
-      },
+  },
+  creationDate: {
+    type: Date,
+  },
 
-      lastestModificationDate:
-      {
-          type:Date,
-      },
+  lastestModificationDate:
+  {
+    type: Date,
+  },
 
-      description:{
-          type:String,
-          default:''
-      },
-      screenshotName:{
-           type: String, 
-           default: '' 
-        },
+  description: {
+    type: String,
+    default: ''
+  },
+  screenshotName: {
+    type: String,
+    default: ''
+  },
 
-    
-    screenshotPath:{ 
-        type: String, 
-        default: '' 
-    },
-    // screenshotName:[String],
 
- 
-    // screenshotPath:[String] 
- 
+  screenshotPath: {
+    type: String,
+    default: ''
+  },
 
-     
-
-      
 
 })
 
 // creating a text index.
 // setting up text indexes on all string fields in our model.
-issueSchema.index({ '$**' : 'text' })
+issueSchema.index({ '$**': 'text' })
 
 mongoose.model('Issues', issueSchema);

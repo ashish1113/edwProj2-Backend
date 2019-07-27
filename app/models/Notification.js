@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-let notificationSchema = new Schema ({
+let notificationSchema = new Schema({
     notificationId: {
         type: String,
         default: '',
@@ -12,24 +12,24 @@ let notificationSchema = new Schema ({
     notificationIssueData:
     {
         type: Object,
-        required:true
+        required: true
 
     },
     notificationStatus: {
         type: String,
         default: 'un-seen'
     },
-    
-    notificationMessage:Object,
-    userEmailToSendNotification:{
+
+    notificationMessage: Object,
+    userEmailToSendNotification: {
         type: String,
         default: ''
     },
-    notificationPurpose:{
+    notificationPurpose: {
 
         type: String,
-        //default: ''
-        
+
+
     }
 })
 
